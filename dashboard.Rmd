@@ -1,0 +1,91 @@
+---
+title: "Who is Looking for a New Job?"
+output: 
+  flexdashboard::flex_dashboard:
+    runtime: shiny
+    orientation: rows
+---
+```{r setup, include=FALSE}
+#^^^NOTE the different header above^^^
+#This is because I use a reactive environment on page 3 now
+
+#Incorporating Shiny (interactive) components into flexdashboard:
+#https://rmarkdown.rstudio.com/flexdashboard/shiny.html#simple_example
+library(flexdashboard)
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+library(reshape2)
+library(randomForest)
+
+
+# Set working directory
+setwd("~/DRAKE_DEV/SPRING_2021/STAT_190/newJob")
+
+# Read in data
+jobs <- read.csv("aug_train.csv")
+
+
+# Clean Data --------------------------------------------------------------
+# Currently any missing value is stored as a blank character, "", rather than NA
+# First for each variable we make the missing values = NA
+# Then I factor each categorical variable
+jobs$enrollee_id[jobs$enrollee_id == ""] <- NA
+
+jobs$city[jobs$city == ""] <- NA
+jobs$city <- as.factor(jobs$city)
+
+jobs$city_development_index[jobs$city_development_index == ""] <- NA
+
+
+jobs$gender[jobs$gender == ""] <- NA
+jobs$gender <- as.factor(jobs$gender)
+
+jobs$relevent_experience[jobs$relevent_experience == ""] <- NA
+jobs$relevent_experience <- as.factor(jobs$relevent_experience)
+
+jobs$enrolled_university[jobs$enrolled_university == ""] <- NA
+jobs$enrolled_university <- as.factor(jobs$enrolled_university)
+
+jobs$education_level[jobs$education_level == ""] <- NA
+jobs$education_level <- as.factor(jobs$education_level)
+
+jobs$major_discipline[jobs$major_discipline == ""] <- NA
+jobs$major_discipline <- as.factor(jobs$major_discipline)
+
+jobs$experience[jobs$experience == ""] <- NA
+jobs$experience <- as.factor(jobs$experience)
+
+jobs$company_size[jobs$company_size == ""] <- NA
+jobs$company_size <- as.factor(jobs$company_size)
+
+jobs$company_type[jobs$company_type == ""] <- NA
+jobs$company_type <- as.factor(jobs$company_type)
+
+jobs$last_new_job[jobs$last_new_job == ""] <- NA
+jobs$last_new_job <- as.factor(jobs$last_new_job)
+
+jobs$training_hours[jobs$training_hours == ""] <- NA
+jobs$target[jobs$target == ""] <- NA
+jobs$target <- as.factor(jobs$target)
+
+# Use na.roughfix to fill in the missing values so there will not be any errors
+# when creating the random forest
+jobs <- na.roughfix(jobs)
+```
+
+Data Overview
+===================================== 
+
+### Introduction
+This data set consists of data for whether or not a person is interested in leaving
+their current job. This data comes from a company who hires their data science teams
+by hosting workshops that are open to everyone, with the hope that they will be able
+to find outstanding participants to poach from their current company. However, not
+everyone who attends these workshops are looking for a job change. These participants
+ultimately cause the host to loose money, as they are not getting a potential new
+hire from the event. Because of this, the company wants to know whether or not 
+a person is looking for a job change so that they can begin to only allow those individuals
+to sign up for the workshop
+
+
