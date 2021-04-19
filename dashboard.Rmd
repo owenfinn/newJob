@@ -77,6 +77,8 @@ jobs <- na.roughfix(jobs)
 Data Overview
 ===================================== 
 
+Row 
+-----------------------------------------------------------------------
 ### Introduction
 This data set consists of data for whether or not a person is interested in leaving
 their current job. This data comes from a company who hires their data science teams
@@ -87,5 +89,15 @@ ultimately cause the host to loose money, as they are not getting a potential ne
 hire from the event. Because of this, the company wants to know whether or not 
 a person is looking for a job change so that they can begin to only allow those individuals
 to sign up for the workshop
+
+Row 
+-----------------------------------------------------------------------
+
+### Research Questions
+The ultimate research question for this project is: "Is this person looking for a job
+change in the field of data analytics"
+
+In order to answer this question, I will be creating a random forest that will allow
+for the host company to predict whether or not a participant is looking for a new job
 
 
