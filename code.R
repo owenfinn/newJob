@@ -41,7 +41,10 @@ jobs$major_discipline[jobs$major_discipline == ""] <- NA
 jobs$major_discipline <- as.factor(jobs$major_discipline)
 
 jobs$experience[jobs$experience == ""] <- NA
-jobs$experience <- as.factor(jobs$experience)
+jobs$experience <- factor(jobs$experience ,
+                          levels = c("<1", "1", "2", "3", "4", "5", "6", "7", "8",
+                                     "9", "10", "11", "12", "13", "14", "15", "16",
+                                     "17", "18", "19", ">20"))
 
 jobs$company_size[jobs$company_size == ""] <- NA
 jobs$company_size <- as.factor(jobs$company_size)
@@ -62,8 +65,40 @@ jobs <- na.roughfix(jobs)
 
 
 # Visualizations ----------------------------------------------------------
+
+# Looking at City Development Index
 ggplot(data = jobs) +
-  geom_point(aes(x = city_development_index, y = target))
+  geom_jitter(aes(x = target, y = city_development_index), alpha = I(.4), colour = "grey") +
+  geom_boxplot(aes(x = target, y = city_development_index), alpha = 0) +
+  labs(x = "Target", y = "City Development Index") +
+  theme_bw()
+
+# Looking at relevent experience
+ggplot(data = jobs) +
+  geom_bar(aes(x = relevent_experience, fill = target), position="fill") +
+  ggtitle("Relation of Relevent Experience vs Target") +
+  labs(x = "Relevent Experience",
+       y = "Proportional Amount") +
+  scale_fill_grey("Target") + 
+  scale_colour_grey("Target") + 
+  theme_bw()
+
+# Now just experience
+ggplot(data = jobs) +
+  geom_bar(aes(x = experience, fill = target), position="fill") +
+  ggtitle("Relation of Experience vs Target") +
+  labs(x = "Experience",
+       y = "Proportional Amount") +
+  scale_fill_grey("Target") + 
+  scale_colour_grey("Target") + 
+  theme_bw()
+
+# Looking at number of training hours
+ggplot(data = jobs) +
+  geom_jitter(aes(x = target, y = training_hours), alpha = I(.4), colour = "grey") +
+  geom_boxplot(aes(x = target, y = training_hours), alpha = 0) +
+  labs(x = "Target", y = "Number of Training Hours") +
+  theme_bw()
 
 # Random Forest -----------------------------------------------------------
 # Set seed and create training and testing data sets
