@@ -54,7 +54,10 @@ jobs$major_discipline[jobs$major_discipline == ""] <- NA
 jobs$major_discipline <- as.factor(jobs$major_discipline)
 
 jobs$experience[jobs$experience == ""] <- NA
-jobs$experience <- as.factor(jobs$experience)
+jobs$experience <- factor(jobs$experience ,
+                          levels = c("<1", "1", "2", "3", "4", "5", "6", "7", "8",
+                                     "9", "10", "11", "12", "13", "14", "15", "16",
+                                     "17", "18", "19", ">20"))
 
 jobs$company_size[jobs$company_size == ""] <- NA
 jobs$company_size <- as.factor(jobs$company_size)
@@ -90,9 +93,6 @@ hire from the event. Because of this, the company wants to know whether or not
 a person is looking for a job change so that they can begin to only allow those individuals
 to sign up for the workshop
 
-Row 
------------------------------------------------------------------------
-
 ### Research Questions
 The ultimate research question for this project is: "Is this person looking for a job
 change in the field of data analytics"
@@ -100,4 +100,90 @@ change in the field of data analytics"
 In order to answer this question, I will be creating a random forest that will allow
 for the host company to predict whether or not a participant is looking for a new job
 
+Row 
+-----------------------------------------------------------------------
+### Variable Explanation
+This data set's y variable is "target" which is 1 if the person is interested in leaving
+their current job and 0 if not. This data set also has 13 x variables which are:  
+•	enrollee_id: Unique ID for candidate  
+•	city: City code  
+•	city_ development _index: Development index of the city (scaled)  
+•	gender: Gender of candidate  
+•	relevent_experience: Relevant experience of candidate  
+•	enrolled_university: Type of University course enrolled if any  
+•	education_level: Education level of candidate  
+•	major_discipline: Education major discipline of candidate  
+•	experience: Candidate total experience in years  
+•	company_size: No of employees in current employer's company  
+•	company_type: Type of current employer  
+•	lastnewjob: Difference in years between previous job and current job  
+•	training_hours: training hours completed  
+
+
+### Data Cleaning
+There was not much data cleaning that had to be done in order to get this data set
+ready to be used. The biggest issue was the large number of missing values. These
+missing values were also stored as " " (or just a space), rather than just being left
+empty. This meant that for every variable, I had to change the spaces to be the
+NA value. I wanted them as NA values so that I could use na.roughfix in order to 
+get an average value in there so that my random forest would run without any errors.
+In addition, for each categorical variable, I had to make it a factor using as.factor.
+
+
+Exploratory Analysis
+===================================== 
+
+Row
+-----------------------------------------------------------------------
+
+### Looking at the relationship between City Development Index and Target
+```{r cdiPlot, include=TRUE}
+# Looking at City Development Index
+ggplot(data = jobs) +
+  geom_jitter(aes(x = target, y = city_development_index), alpha = I(.4), colour = "grey") +
+  geom_boxplot(aes(x = target, y = city_development_index), alpha = 0) +
+  labs(x = "Target", y = "City Development Index") +
+  theme_bw()
+```
+
+
+### Looking at the relationship between Training Hours and Target
+```{r trainHrsPlot, include=TRUE}
+# Looking at number of training hours
+ggplot(data = jobs) +
+  geom_jitter(aes(x = target, y = training_hours), alpha = I(.4), colour = "grey") +
+  geom_boxplot(aes(x = target, y = training_hours), alpha = 0) +
+  labs(x = "Target", y = "Number of Training Hours") +
+  theme_bw()
+```
+
+Row 
+-----------------------------------------------------------------------
+
+### Looking at the relationship between Relevent Experience and Target
+```{r revExPlot, include=TRUE}
+# Looking at relevent experience
+ggplot(data = jobs) +
+  geom_bar(aes(x = relevent_experience, fill = target), position="fill") +
+  ggtitle("Relation of Relevent Experience vs Target") +
+  labs(x = "Relevent Experience",
+       y = "Proportional Amount") +
+  scale_fill_grey("Target") + 
+  scale_colour_grey("Target") + 
+  theme_bw()
+
+```
+
+### Looking at the relationship between Experience and Target
+```{r expPlot, include=TRUE}
+# Now just experience
+ggplot(data = jobs) +
+  geom_bar(aes(x = experience, fill = target), position="fill") +
+  ggtitle("Relation of Experience vs Target") +
+  labs(x = "Experience",
+       y = "Proportional Amount") +
+  scale_fill_grey("Target") + 
+  scale_colour_grey("Target") + 
+  theme_bw()
+```
 
