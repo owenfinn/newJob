@@ -17,6 +17,7 @@ library(dplyr)
 library(RColorBrewer)
 library(reshape2)
 library(randomForest)
+library(pROC)
 
 
 # Set working directory
@@ -107,7 +108,7 @@ This data set's y variable is "target" which is 1 if the person is interested in
 their current job and 0 if not. This data set also has 13 x variables which are:  
 •	enrollee_id: Unique ID for candidate  
 •	city: City code  
-•	city_ development _index: Development index of the city (scaled)  
+•	city_development_index: Development index of the city (scaled)  
 •	gender: Gender of candidate  
 •	relevent_experience: Relevant experience of candidate  
 •	enrolled_university: Type of University course enrolled if any  
@@ -123,7 +124,7 @@ their current job and 0 if not. This data set also has 13 x variables which are:
 ### Data Cleaning
 There was not much data cleaning that had to be done in order to get this data set
 ready to be used. The biggest issue was the large number of missing values. These
-missing values were also stored as " " (or just a space), rather than just being left
+missing values were also stored as " " (just a space), rather than just being left
 empty. This meant that for every variable, I had to change the spaces to be the
 NA value. I wanted them as NA values so that I could use na.roughfix in order to 
 get an average value in there so that my random forest would run without any errors.
@@ -185,5 +186,77 @@ ggplot(data = jobs) +
   scale_fill_grey("Target") + 
   scale_colour_grey("Target") + 
   theme_bw()
+```
+
+The Random Forest
+===================================== 
+```{r randForest, include=FALSE}
+
+RNGkind(sample.kind = "default")
+set.seed(190)
+train.idx <- sample(x = 1:nrow(jobs), size = floor(.8*nrow(jobs)))
+train.df <- jobs[train.idx,]
+test.df <- jobs[-train.idx,] 
+
+keeps2 <- data.frame("m"=c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), 
+                      "OOB_err_rate"=c(0.2420723, 0.2224325, 0.2256296, 0.2288268,
+                                       0.2308495, 0.2315020, 0.2311105, 0.2328070,
+                                       0.2334595, 0.2320893, 0.2348297))
+
+final_forest <- randomForest(target ~ city_development_index + gender + relevent_experience +
+                           enrolled_university + education_level + major_discipline +
+                           experience + company_size + company_type + last_new_job + training_hours,
+                         data = train.df,
+                         ntree = 1000,
+                         mtry = 2, 
+                         importance = TRUE) 
+```
+
+Row
+-----------------------------------------------------------------------
+
+### About the Random Forest
+In order to solve my research questions, I created a random forest to predict 
+the y variable of target. In order to do this I used 11 out of the 13 provided x
+variables. The two x variables I did not use were "enrollee_id" and "city". I did
+not include "enrollee_id" in the prediction method because it is simply a unique 
+identifier that has nothing to do with the y variable and how it would be decided. 
+I originally did want to use "city" in the prediction, however the variable was 
+categorical with over 53 different categories so the random forest would produce 
+an error with this variable included. In addition, there is no information about 
+what city each code corresponds to so it is impossible to even do anything like 
+recode the variable into something more broad such as by states.With this in mind, 
+I created a baseline forest that was very large and had an mtry value of 11. After 
+creating this massive tree, I wanted to find the tree that minimized the out of 
+bag error rate. I found this by looping through forests with mtry values of 1 through 
+11 and then creating my final forest with a mtry value that minimized the OOB error rate.
+
+### mtry Graph
+
+```{r mtry, include=TRUE}
+qplot(m, OOB_err_rate, geom = c("line", "point"), data = keeps2) + 
+  theme_bw() + labs(x = "m (mtry) value", y = "OOB error rate")
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### ROC Curve
+```{r rocCurve}
+test.df$forest_pred <- predict(final_forest, test.df, type = "class")
+pi_hat <- predict(final_forest, test.df, type = "prob")[, 1]
+
+rocCurve <- roc(response = test.df$target,
+                predictor = as.vector(pi_hat),
+                levels = c(0, 1))
+
+plot(rocCurve, print.auc = TRUE, print.thres = TRUE)
+```
+
+
+### Variable Importance Plot
+```{r varImp}
+varImpPlot(final_forest, type = 1)
 ```
 
