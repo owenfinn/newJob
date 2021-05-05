@@ -260,3 +260,66 @@ plot(rocCurve, print.auc = TRUE, print.thres = TRUE)
 varImpPlot(final_forest, type = 1)
 ```
 
+
+Make a Prediction
+===================================== 
+Inputs {.sidebar}
+-----------------------------------------------------------------------
+
+```{r inputs}
+sliderInput("cdi.input", label = "City Development Index:",
+            min = 0, max = 1, value = 0.5, step = 0.001)
+selectInput("gender.input", label = "Gender:",
+            c("Male", "Female", "Other"), multiple = FALSE)
+selectInput("revExp.input", label = "Relevant Experience:",
+            c("Has relevent experience", "No relevent experience"), multiple = FALSE)
+selectInput("enrollUni.input", label = "Enrolled University:",
+            c("Full time course", "No enrollment" = "no_enrollment", "Part time course"), multiple = FALSE)
+selectInput("eduLevel.input", label = "Education Level:",
+            c("Graduate", "High School", "Masters", "Phd", "Primary School"), multiple = FALSE)
+selectInput("majDis.input", label = "Major Discipline:",
+            c("Arts", "Business" = "Business Degree", "Humanities", "No Major", "STEM", "Other"),
+            multiple = FALSE)
+selectInput("exp.input", label = "Experience:",
+            c("<1", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 
+              "12", "13", "14", "15", "16", "17", "18", "19", ">20"), multiple = FALSE)
+selectInput("compSize.input", label = "Company Size:",
+            c("<10", "10-49", "50-99", "100-499", "500-999", "1000-4999", "5000-9999", "10000+"),
+            multiple = FALSE)
+selectInput("compType.input", label = "Company Type",
+            c("Early Stage Startup", "Funded Startup", "NGO", "Public Sector", "Pvt Ltd", "Other"), 
+            multiple = FALSE)
+selectInput("lastNewJob.input", label = "Last New Job:",
+            c("1", "2", "3", "4", ">4", "never"), multiple = FALSE)
+sliderInput("trainingHrs.input", label = "Training Hours:",
+            min = 0, max = 500, value = 250, step = 1)
+```
+
+Row 
+-----------------------------------------------------------------------
+
+### Prediction with given inputs
+
+```{r }
+renderValueBox({
+  new.df <- data.frame(city_development_index = input$cdi.input,
+                       gender = input$gender.input,
+                       relevent_experience = input$revExp.input,
+                       enrolled_university = input$enrollUni.input,
+                       education_level = input$eduLevel.input,
+                       major_discipline = input$majDis.input,
+                       experience = input$exp.input,
+                       company_size = input$compSize.input,
+                       company_type = input$compType.input,
+                       last_new_job = input$lastNewJob.input,
+                       training_hours = input$trainingHrs.input)
+
+prediction_class <- predict(final_forest, new.df, type = "class")
+
+valueBox(prediction_class, 
+           icon = "chart-line",
+           color = "blue") 
+  
+})
+
+```

@@ -47,6 +47,7 @@ jobs$experience <- factor(jobs$experience ,
                                      "17", "18", "19", ">20"))
 
 jobs$company_size[jobs$company_size == ""] <- NA
+jobs$company_size[jobs$company_size == "10/49"] <- "10-49"
 jobs$company_size <- as.factor(jobs$company_size)
 
 jobs$company_type[jobs$company_type == ""] <- NA
@@ -56,6 +57,8 @@ jobs$last_new_job[jobs$last_new_job == ""] <- NA
 jobs$last_new_job <- as.factor(jobs$last_new_job)
 
 jobs$training_hours[jobs$training_hours == ""] <- NA
+jobs$training_hours <- as.numeric(jobs$training_hours)
+
 jobs$target[jobs$target == ""] <- NA
 jobs$target <- as.factor(jobs$target)
 
