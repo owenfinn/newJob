@@ -24,21 +24,25 @@ jobs$city <- as.factor(jobs$city)
 
 jobs$city_development_index[jobs$city_development_index == ""] <- NA
 
-
 jobs$gender[jobs$gender == ""] <- NA
-jobs$gender <- as.factor(jobs$gender)
+jobs$gender <- factor(jobs$gender, levels = c("Male", "Female", "Other"))
 
 jobs$relevent_experience[jobs$relevent_experience == ""] <- NA
-jobs$relevent_experience <- as.factor(jobs$relevent_experience)
+jobs$relevent_experience <- factor(jobs$relevent_experience, 
+                                   levels = c("Has relevent experience", "No relevent experience"))
 
 jobs$enrolled_university[jobs$enrolled_university == ""] <- NA
-jobs$enrolled_university <- as.factor(jobs$enrolled_university)
+jobs$enrolled_university <- factor(jobs$enrolled_university, 
+                                   levels = c("Full time course", "no_enrollment", "Part time course"))
+
 
 jobs$education_level[jobs$education_level == ""] <- NA
-jobs$education_level <- as.factor(jobs$education_level)
+jobs$education_level <- factor(jobs$education_level, 
+                               levels = c("Graduate", "High School", "Masters", "Phd", "Primary School"))
 
 jobs$major_discipline[jobs$major_discipline == ""] <- NA
-jobs$major_discipline <- as.factor(jobs$major_discipline)
+jobs$major_discipline <- factor(jobs$major_discipline,
+                                levels =  c("Arts", "Business Degree", "Humanities", "No Major", "STEM", "Other"))
 
 jobs$experience[jobs$experience == ""] <- NA
 jobs$experience <- factor(jobs$experience ,
@@ -48,13 +52,16 @@ jobs$experience <- factor(jobs$experience ,
 
 jobs$company_size[jobs$company_size == ""] <- NA
 jobs$company_size[jobs$company_size == "10/49"] <- "10-49"
-jobs$company_size <- as.factor(jobs$company_size)
+jobs$company_size <- factor(jobs$company_size, 
+                            levels =  c("<10", "10-49", "50-99", "100-499", "500-999", "1000-4999", "5000-9999", "10000+"))
 
 jobs$company_type[jobs$company_type == ""] <- NA
-jobs$company_type <- as.factor(jobs$company_type)
+jobs$company_type <- factor(jobs$company_type, 
+                            levels =  c("Early Stage Startup", "Funded Startup", "NGO", "Public Sector", "Pvt Ltd", "Other"))
 
 jobs$last_new_job[jobs$last_new_job == ""] <- NA
-jobs$last_new_job <- as.factor(jobs$last_new_job)
+jobs$last_new_job <- factor(jobs$last_new_job, 
+                            levels = c("1", "2", "3", "4", ">4", "never"))
 
 jobs$training_hours[jobs$training_hours == ""] <- NA
 jobs$training_hours <- as.numeric(jobs$training_hours)

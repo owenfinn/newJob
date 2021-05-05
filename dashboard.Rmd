@@ -28,9 +28,6 @@ jobs <- read.csv("aug_train.csv")
 
 
 # Clean Data --------------------------------------------------------------
-# Currently any missing value is stored as a blank character, "", rather than NA
-# First for each variable we make the missing values = NA
-# Then I factor each categorical variable
 jobs$enrollee_id[jobs$enrollee_id == ""] <- NA
 
 jobs$city[jobs$city == ""] <- NA
@@ -38,21 +35,26 @@ jobs$city <- as.factor(jobs$city)
 
 jobs$city_development_index[jobs$city_development_index == ""] <- NA
 
-
 jobs$gender[jobs$gender == ""] <- NA
-jobs$gender <- as.factor(jobs$gender)
+jobs$gender <- factor(jobs$gender, levels = c("Male", "Female", "Other"))
 
 jobs$relevent_experience[jobs$relevent_experience == ""] <- NA
-jobs$relevent_experience <- as.factor(jobs$relevent_experience)
+jobs$relevent_experience <- factor(jobs$relevent_experience, 
+                                   levels = c("Has relevent experience", "No relevent experience"))
 
 jobs$enrolled_university[jobs$enrolled_university == ""] <- NA
-jobs$enrolled_university <- as.factor(jobs$enrolled_university)
+jobs$enrolled_university <- factor(jobs$enrolled_university, 
+                                   levels = c("Full time course", "no_enrollment", "Part time course"))
+
 
 jobs$education_level[jobs$education_level == ""] <- NA
-jobs$education_level <- as.factor(jobs$education_level)
+jobs$education_level <- factor(jobs$education_level, 
+                               levels = c("Graduate", "High School", "Masters", "Phd", "Primary School"))
 
 jobs$major_discipline[jobs$major_discipline == ""] <- NA
-jobs$major_discipline <- as.factor(jobs$major_discipline)
+jobs$major_discipline <- factor(jobs$major_discipline,
+                                levels =  c("Arts", "Business Degree", "Humanities", "No Major", "STEM",
+                                            "Other"))
 
 jobs$experience[jobs$experience == ""] <- NA
 jobs$experience <- factor(jobs$experience ,
@@ -61,15 +63,23 @@ jobs$experience <- factor(jobs$experience ,
                                      "17", "18", "19", ">20"))
 
 jobs$company_size[jobs$company_size == ""] <- NA
-jobs$company_size <- as.factor(jobs$company_size)
+jobs$company_size[jobs$company_size == "10/49"] <- "10-49"
+jobs$company_size <- factor(jobs$company_size, 
+                            levels =  c("<10", "10-49", "50-99", "100-499", "500-999", "1000-4999",
+                                        "5000-9999", "10000+"))
 
 jobs$company_type[jobs$company_type == ""] <- NA
-jobs$company_type <- as.factor(jobs$company_type)
+jobs$company_type <- factor(jobs$company_type, 
+                            levels =  c("Early Stage Startup", "Funded Startup", "NGO", "Public Sector", "Pvt
+                                        Ltd", "Other"))
 
 jobs$last_new_job[jobs$last_new_job == ""] <- NA
-jobs$last_new_job <- as.factor(jobs$last_new_job)
+jobs$last_new_job <- factor(jobs$last_new_job, 
+                            levels = c("1", "2", "3", "4", ">4", "never"))
 
 jobs$training_hours[jobs$training_hours == ""] <- NA
+jobs$training_hours <- as.numeric(jobs$training_hours)
+
 jobs$target[jobs$target == ""] <- NA
 jobs$target <- as.factor(jobs$target)
 
@@ -267,8 +277,8 @@ Inputs {.sidebar}
 -----------------------------------------------------------------------
 
 ```{r inputs}
-sliderInput("cdi.input", label = "City Development Index:",
-            min = 0, max = 1, value = 0.5, step = 0.001)
+numericInput("cdi.input", label = "City Development Index:",
+             value = 0.5, min = 0, max = 1, step = 0.001)
 selectInput("gender.input", label = "Gender:",
             c("Male", "Female", "Other"), multiple = FALSE)
 selectInput("revExp.input", label = "Relevant Experience:",
@@ -291,8 +301,8 @@ selectInput("compType.input", label = "Company Type",
             multiple = FALSE)
 selectInput("lastNewJob.input", label = "Last New Job:",
             c("1", "2", "3", "4", ">4", "never"), multiple = FALSE)
-sliderInput("trainingHrs.input", label = "Training Hours:",
-            min = 0, max = 500, value = 250, step = 1)
+numericInput("trainingHrs.input", label = "Training Hours:",
+            value = 250, min = 0, max = 500, step = 1)
 ```
 
 Row 
@@ -302,6 +312,7 @@ Row
 
 ```{r }
 renderValueBox({
+  
   new.df <- data.frame(city_development_index = input$cdi.input,
                        gender = input$gender.input,
                        relevent_experience = input$revExp.input,
@@ -314,6 +325,29 @@ renderValueBox({
                        last_new_job = input$lastNewJob.input,
                        training_hours = input$trainingHrs.input)
 
+new.df$gender <- factor(new.df$gender, levels = c("Male", "Female", "Other"))
+new.df$relevent_experience <- factor(new.df$relevent_experience, 
+                                   levels = c("Has relevent experience", "No relevent experience"))
+new.df$enrolled_university <- factor(new.df$enrolled_university, 
+                                   levels = c("Full time course", "no_enrollment", "Part time course"))
+new.df$education_level <- factor(new.df$education_level, 
+                               levels = c("Graduate", "High School", "Masters", "Phd", "Primary School"))
+new.df$major_discipline <- factor(new.df$major_discipline,
+                                levels =  c("Arts", "Business Degree", "Humanities", "No Major", "STEM",
+                                            "Other"))
+new.df$experience <- factor(new.df$experience ,
+                          levels = c("<1", "1", "2", "3", "4", "5", "6", "7", "8",
+                                     "9", "10", "11", "12", "13", "14", "15", "16",
+                                     "17", "18", "19", ">20"))
+new.df$company_size <- factor(new.df$company_size, 
+                            levels =  c("<10", "10-49", "50-99", "100-499", "500-999", "1000-4999",
+                                        "5000-9999", "10000+"))
+new.df$company_type <- factor(new.df$company_type, 
+                            levels =  c("Early Stage Startup", "Funded Startup", "NGO", "Public Sector", "Pvt
+                                        Ltd", "Other"))
+new.df$last_new_job <- factor(new.df$last_new_job, 
+                            levels = c("1", "2", "3", "4", ">4", "never"))
+
 prediction_class <- predict(final_forest, new.df, type = "class")
 
 valueBox(prediction_class, 
@@ -323,3 +357,24 @@ valueBox(prediction_class,
 })
 
 ```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### Relation of Predicted Target vs Actual Target on Testing Data
+```{r predictGraph}
+test.df$forest_pred <- predict(final_forest, test.df, type = "class")
+
+# Prediction graph
+ggplot(data = test.df) +
+  geom_bar(aes(x = forest_pred, fill = target), position="fill") +
+  ggtitle("Relation of Predicted Target vs Actual Target") +
+  labs(x = "Predicted Overall Target",
+       y = "Proportional Amount") +
+  scale_fill_grey("Actual Target") + 
+  scale_colour_grey("Actual Target") + 
+  theme_bw()
+
+```
+
